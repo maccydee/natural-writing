@@ -59,6 +59,8 @@ These three are weighted heavily by "slop" scorers because they're so distinctiv
 > **Before:** "It's not just a notebook. It's a system for thinking."
 > **After:** "I use it as a notebook, though it's grown into how I plan my week."
 
+**The polished-cadence tell — tidy parallel lists that resolve into a neat payoff, plus a clever closer on every point.** The sneakiest tell of all, because it passes every automated check; only the ear catches it. Two shapes. (a) A parallel list, often three gerund or noun phrases, that lands on an abstract, quotable kicker: *"Writing things down, keeping the docs and runbooks real, and working so nobody has to be in a room to get unblocked."* (b) Ending point after point on a smooth aphorism: *"…and it's the one I want," "…somewhere I'd fit," "…the thing I wished existed."* The problem is never one line. It's that every sentence lands a little too well, with the balance and payoff of a sentence built to be quoted rather than someone thinking out loud. Fixes: break the parallelism (say two things, not a rhythmic three), and let sentences end flat, on the plain fact, with no kicker. A quick test: if a sentence would work as a motivational poster, cut the poster half. `detect.py` flags the triadic-phrase shape as `polished-cadence`, but most of this is a Tier-2 adversarial-read catch, not a linter one. When a reader says "I can't say why but it sounds like AI," this is almost always what they're feeling.
+
 ---
 
 ## 4. Structural tells
@@ -66,13 +68,14 @@ These three are weighted heavily by "slop" scorers because they're so distinctiv
 - **Uniform paragraph length** — every paragraph three or four sentences, every section the same shape. Real writing has a one-line paragraph sitting next to a seven-line one.
 - **Restate-everything conclusions** — "Despite its challenges, X remains promising, and its importance will only grow." Cut it. End on your last real point, not a summary of the points above.
 - **Bulleting prose that should flow** — chopping connected reasoning into bold-header + colon bullets. Lists are for genuinely list-like things (steps, options, specs). If the items depend on each other, write sentences.
-- **Over-explaining / closing every point with its significance** — "…highlighting the enduring importance of collaboration." Trust the reader to see why it matters; delete the significance clause.
+- **Over-explaining / closing every point with its significance** — "…highlighting the enduring importance of collaboration." Trust the reader to see why it matters; delete the significance clause. The sneakiest form is a **trailing appositive tacked on after a comma** that restates what the thing is *for*: "…compliance content for DISA STIG and PCI, the rules that keep regulated organisations in control of what runs in their estate." The facts before the comma are fine; the "…, the rules that keep…" is the tell, and it's worse when it parrots the reader's own words (a job description, a brief) back at them, which reads as reverse-engineered. Fixes: state the thing and stop ("…compliance content for DISA STIG and PCI."). Watch for the family: ", the X that keeps/makes/gives/ensures…", ", which is why/what/how…", "…that keeps them in check/control." `detect.py` flags these as `over-explain`. One occasional appositive is fine; the habit is the tell.
 
 ---
 
 ## 5. Punctuation and typography
 
 - **Em-dash overuse** — several per paragraph, standing in for commas, colons, and parentheses all at once. Em-dashes are fine; a cluster of them is the tell. Roughly one per few paragraphs is a safe ceiling.
+- **Colon-reveal overuse** — the "statement: elaboration" move ("The answer was simple: gates." / "Your framing is mine: reduce friction.") used again and again. One is fine; three or more in a short piece reads as an engineered rhythm, a dramatic pause dropped in every few lines. Recast most of them into plain sentences ("The answer was simple. I built gates."); keep the colon for a genuine list or the occasional deliberate reveal. A structural label colon in a skills list or table is not this tell. (`detect.py` flags this as `colon-reveal`.)
 - **Curly/smart quotes and apostrophes** where a person typing in a plain editor would produce straight ones — a copy-paste-from-chatbot fingerprint. Match whatever the surrounding context uses.
 - **Title Case On Every Heading** — humans usually sentence-case ("Impact of technology," not "The Impact Of Technology And Digitalization").
 - **Emoji section bullets/headers** (✅ 🚀 💡 🔑) and reflexive **bold** on every key term. Use sparingly and only where the context actually calls for it.

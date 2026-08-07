@@ -131,6 +131,43 @@ def analyze(text):
     sev = "WARN" if em_per_para > 1.5 else "OK"
     checks.append(("em-dash-clustering", sev, em, f"{em} em-dashes over {len(paras)} paragraphs", (8 if em_per_para > 1.5 else 0)))
 
+    # 8b. colon-reveal overuse (the "statement: elaboration" construction, a tic when repeated)
+    # a letter/paren, then ':', then whitespace and content. Skips URLs (http://) and times (5:20).
+    cr = len(re.findall(r"[A-Za-z)]:\s+\S", text))
+    cr_dens = cr / max(1, wc) * 100
+    # density-aware: a few colons in a long piece is fine; a cluster in a short span is the tic.
+    sev = "FAIL" if (cr_dens >= 4 or cr >= 6) else ("WARN" if cr >= 3 else "OK")
+    pts = (min(20, cr * 3) if sev == "FAIL" else (min(6, (cr - 2) * 2) if sev == "WARN" else 0))
+    checks.append(("colon-reveal", sev, cr,
+                   f"{cr} 'statement: elaboration' colons ({cr_dens:.1f}/100 words); repeated colon-reveals read as an engineered tic",
+                   pts))
+
+    # 8c. over-explain / significance-clause: a trailing appositive that restates why
+    #     the thing matters, tacked on after a comma, often parroting the source
+    #     ("...compliance content for PCI, the rules that keep organisations in control").
+    #     Passes a linter, fails a human read. State the thing and trust the reader.
+    over_pats = [
+        r",\s+(?:the|a|an|those|these|the kind of|the sort of)\s+\w+(?:\s+\w+){0,3}?\s+(?:that|which)\s+(?:\w+\s+){0,3}?(?:keeps?|makes?|gives?|allows?|ensures?|helps?|lets?|drives?|enables?|powers?|brings?|underpins?|guarantees?|means?)\b",
+        r",\s+which\s+is\s+(?:why|what|how|where)\b",
+        r"\bthat\s+keeps?\b[\w\s,]{0,40}\bin\s+(?:check|control|line)\b",
+    ]
+    over = sum(len(re.findall(p, text, re.I)) for p in over_pats)
+    sev = "FAIL" if over >= 3 else ("WARN" if over >= 1 else "OK")
+    opts = (min(15, over * 5) if sev == "FAIL" else (over * 3 if sev == "WARN" else 0))
+    checks.append(("over-explain", sev, over,
+                   (f"{over} trailing 'significance' clause(s), e.g. ', the X that keeps…' — state it and trust the reader" if over else "none"),
+                   opts))
+
+    # 8d. polished-cadence: a tidy parallel list (often three gerund phrases) that lands
+    #     on a neat payoff. Passes linters; it's the "too polished" ear-catch. Low-weight nudge,
+    #     the real catch is the Tier-2 adversarial read (see ai-tells.md "polished-cadence").
+    pc = len(re.findall(r"\b\w+ing\b[^,.;:!?]{2,70},\s+\w+ing\b[^,.;:!?]{2,70},\s+(?:and\s+)?\w+ing\b", text, re.I))
+    sev = "WARN" if pc >= 1 else "OK"
+    pcpts = min(6, pc * 4) if pc else 0
+    checks.append(("polished-cadence", sev, pc,
+                   (f"{pc} triadic parallel phrase list(s), e.g. 'doing X, keeping Y, and working Z' — break the pattern, let it end flat" if pc else "none"),
+                   pcpts))
+
     # 9. contractions present (their absence is a tell)
     contr = len(re.findall(r"\b\w+['’](t|s|re|ve|ll|d|m)\b", text, re.I))
     sev = "WARN" if contr == 0 and wc > 60 else "OK"
