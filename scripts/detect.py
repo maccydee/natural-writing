@@ -86,6 +86,8 @@ def analyze(text):
     # 3. signature constructions
     not_only = len(re.findall(r"not only\b.{0,60}?\bbut also\b", text, re.I | re.S))
     neg_pivot = len(re.findall(r"\b(it'?s|its)\s+not\s+(just\s+)?[^.,;]{1,40}[.,;]\s*(it'?s|its)\b", text, re.I))
+    # same pivot with any subject: "the hard-won part was not adoption, it was proving X"
+    neg_pivot += len(re.findall(r"\b(?:was|is)\s+not\s+[^,.;]{2,40},\s+it\s+(?:was|is)\b", text, re.I))
     whether = len(re.findall(r"whether you'?re\b[^.]{0,40}\bor\b", text, re.I))
     sig = not_only + neg_pivot + whether
     sev = "FAIL" if sig else "OK"
@@ -192,6 +194,10 @@ def analyze(text):
         r"\bthe \w+ that (?:lets?|keeps?|makes?|allows?|enables?|gives?)\s+\w+",
         # "turned X into something the team solves without me"
         r"\binto something (?:the|that|which)\b",
+        # metaphor-as-placement: "Acceleration sits where it lands", "sits at the intersection of"
+        r"\bsits (?:at the intersection|where|squarely)\b", r"\blives at the (?:intersection|heart)\b",
+        # aphoristic generalisation: "Work that unblocks other teams tends to be under-owned"
+        r"\b(?:work|teams?|people|systems?|things) that [^.,;]{5,50} (?:tends? to be|is usually|are usually|rarely gets?)\b",
     ]
     cf = find_all(CRAFTED, text)
     sev = "WARN" if cf else "OK"
