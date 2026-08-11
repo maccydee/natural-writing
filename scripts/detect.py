@@ -162,11 +162,43 @@ def analyze(text):
     #     on a neat payoff. Passes linters; it's the "too polished" ear-catch. Low-weight nudge,
     #     the real catch is the Tier-2 adversarial read (see ai-tells.md "polished-cadence").
     pc = len(re.findall(r"\b\w+ing\b[^,.;:!?]{2,70},\s+\w+ing\b[^,.;:!?]{2,70},\s+(?:and\s+)?\w+ing\b", text, re.I))
+    # imperative variant: "Scope the problem, structure the context, anticipate how it fails, and you get X"
+    # Must OPEN on a bare command verb, otherwise ordinary factual lists ("I hire, run X, and coach Y")
+    # trip it — those are content, not cadence.
+    _IMP = (r"scope|structure|anticipate|build|ship|make|take|give|start|stop|think|write|keep|let|find|focus|"
+            r"pick|choose|treat|assume|expect|design|plan|measure|define|remove|reduce|automate|delegate")
+    pc += len(re.findall(rf"(?:^|[.!?]\s+)(?:{_IMP})\s+[^,.;:!?]{{2,60}},\s+\w+\s+[^,.;:!?]{{2,60}},\s+(?:and\s+)?\w+\s+",
+                         text, re.I))
+    # a triad that resolves into a quotable kicker ("...and you get X rather than Y")
+    pc += len(re.findall(r",\s+and\s+(?:you|it|that)\s+(?:get|gets|becomes?|means?)\b[^.!?]{0,60}\brather than\b", text, re.I))
+    # antithesis-as-insight: "the hard part was X rather than Y", "it is not about X, it is about Y"
+    pc += len(re.findall(r"\bthe (?:hard|real|tricky|difficult) (?:part|bit|thing)\b[^.!?]{0,60}\b(?:rather than|not)\b", text, re.I))
     sev = "WARN" if pc >= 1 else "OK"
     pcpts = min(6, pc * 4) if pc else 0
     checks.append(("polished-cadence", sev, pc,
-                   (f"{pc} triadic parallel phrase list(s), e.g. 'doing X, keeping Y, and working Z' — break the pattern, let it end flat" if pc else "none"),
+                   (f"{pc} triadic parallel phrase list(s) or quotable payoff, e.g. 'doing X, keeping Y, and working Z' or 'do A, do B, do C, and you get X rather than Y' — break the pattern, let it end flat" if pc else "none"),
                    pcpts))
+
+    # 8e. crafted-phrasing: stock idioms and neat constructions that dress a plain fact up
+    #     as an insight. Individually small; as a habit they are the "sounds authored" tell.
+    #     ("Hands-on where it earns its keep." / "the gates that let the team ship safely")
+    CRAFTED = [
+        r"\bearns? its keep\b", r"\bpunch(?:es|ing)? above\b", r"\bmoves? the needle\b",
+        r"\bheavy lifting\b", r"\bsecret sauce\b", r"\bnorth star\b", r"\bforce multiplier\b",
+        r"\bwhere the rubber meets\b", r"\bbread and butter\b", r"\bhit the ground running\b",
+        r"\bstep change\b", r"\bat the coalface\b", r"\bsingle pane of glass\b",
+        r"\bbest of both worlds\b", r"\braise the bar\b", r"\bmove(?:s|d)? the dial\b",
+        # a purpose clause dressing up a plain noun: "the gates that let the team ship safely"
+        r"\bthe \w+ that (?:lets?|keeps?|makes?|allows?|enables?|gives?)\s+\w+",
+        # "turned X into something the team solves without me"
+        r"\binto something (?:the|that|which)\b",
+    ]
+    cf = find_all(CRAFTED, text)
+    sev = "WARN" if cf else "OK"
+    checks.append(("crafted-phrasing", sev, len(cf),
+                   (", ".join(sorted(set(c.lower() for c in cf))[:5]) if cf else "none")
+                   + (" — say the plain thing instead" if cf else ""),
+                   min(12, len(cf) * 4)))
 
     # 9. contractions present (their absence is a tell)
     contr = len(re.findall(r"\b\w+['’](t|s|re|ve|ll|d|m)\b", text, re.I))
