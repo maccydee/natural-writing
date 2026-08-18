@@ -1,5 +1,8 @@
 # natural-writing
 
+[![Claude skill](https://img.shields.io/badge/Claude-skill-8A2BE2.svg)](https://docs.claude.com/en/docs/claude-code/skills)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
 A [Claude](https://claude.com/claude-code) skill for writing and editing prose that reads as authentically human — voice-driven, specific, and free of the tells that make text sound machine-generated (and that trip AI-detectors).
 
 It ships with a **self-test loop**: content is drafted, tested against a dependency-free slop detector plus an adversarial self-read, revised where flagged, and looped until it holds up.
