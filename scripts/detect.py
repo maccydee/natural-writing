@@ -144,6 +144,35 @@ def analyze(text):
                    f"{cr} 'statement: elaboration' colons ({cr_dens:.1f}/100 words); repeated colon-reveals read as an engineered tic",
                    pts))
 
+    # 8a-ii. corrective antithesis: defining a thing by what it is not, in the
+    #        same breath. "The opt-out is one line, not six." / "It prunes its
+    #        own boards but never gains new ones." / "A feature, not a bug."
+    #
+    #        Same family as "it's not X, it's Y", which is already caught, but
+    #        the trailing and mid-sentence forms slipped through and are the
+    #        ones that actually get written. One is ordinary English. Two in a
+    #        short piece is a habit, and it reads as rhetorical balancing
+    #        rather than as someone saying what happened.
+    corrective = 0
+    corr_hits = []
+    for pat in (r",\s+not\s+(?:just\s+|merely\s+|only\s+)?[^.;:!?\n]{1,34}(?=[.;!?\n]|$)",
+                r"\bbut\s+(?:never|not|no longer)\s+[^.;:!?\n]{1,34}(?=[.;!?\n]|$)"):
+        for m in re.finditer(pat, text, re.I):
+            corrective += 1
+            corr_hits.append(" ".join(m.group(0).split())[:40])
+    c_dens = corrective / max(1, wc) * 100
+    # Density only counts once there is enough text for it to mean anything.
+    # Otherwise a single ordinary "X, not Y" in a two-line note reads as a
+    # crisis.
+    sev = ("FAIL" if (corrective >= 3 or (wc >= 120 and c_dens >= 1.0))
+           else ("WARN" if corrective == 2 else "OK"))
+    checks.append(("corrective-antithesis", sev, corrective,
+                   (f"{corrective} 'X, not Y' / 'but never Y' construction(s): "
+                    f"{'; '.join(corr_hits[:3])}. Say what it is and stop"
+                    if corrective else "none"),
+                   (min(14, corrective * 4) if sev == "FAIL"
+                    else (4 if sev == "WARN" else 0))))
+
     # 8b-ii. the reveal opener: a sentence whose job is to spring a mild
     #        surprise before the fact arrives. "Turns out the hard part was
     #        paying for it." / "What shaped it was the token bill." / "The
