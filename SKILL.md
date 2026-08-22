@@ -114,7 +114,10 @@ python3 scripts/detect.py path/to/draft.md
 
 It prints a per-check report and a slop score, and exits non-zero until the draft has no FAILs and scores ≤ 20. If you have no shell (e.g. a chat-only environment), skip to Tier 2 — the linter is a convenience, not a requirement.
 
-**Tier 2 — the adversarial self-read (always do this; it is the real gate).** Re-read your own draft as if you were a skeptical AI-detector being paid to catch it. Give it an honest AI-likelihood score out of 100 and name the three features most likely to give it away. Be harsh — assume it's guilty. This catches everything the linter can't: gratitude gush, relentless positivity, generic abstraction, no real stance, prose that's *technically* clean but has no pulse. In testing this separated human-grade from machine-grade writing more reliably than any statistical score, so treat it as binding: if you'd rate your own draft above ~25, it isn't done.
+**Tier 2 — the adversarial self-read (always do this; it is the real gate).**
+
+Worth knowing how often this is the only tier that fires. On a recent short post the linter passed three consecutive drafts at 10, 0 and 0, while the self-read caught a "not X but Y" opener, an announced rule-of-three with three identically shaped blocks under it, and then, in the fix for the first one, a reveal construction doing exactly the same work. Every real problem came from reading it as a skeptic. Treat a clean linter run as the start of the check rather than the end of it.
+ Re-read your own draft as if you were a skeptical AI-detector being paid to catch it. Give it an honest AI-likelihood score out of 100 and name the three features most likely to give it away. Be harsh — assume it's guilty. This catches everything the linter can't: gratitude gush, relentless positivity, generic abstraction, no real stance, prose that's *technically* clean but has no pulse. In testing this separated human-grade from machine-grade writing more reliably than any statistical score, so treat it as binding: if you'd rate your own draft above ~25, it isn't done.
 
 **Tier 3 — GPT-2 perplexity (optional, only if `torch`+`transformers` happen to be installed).** Adds the statistical signal classic detectors use:
 
@@ -129,6 +132,8 @@ Higher perplexity and burstiness = more human. If the libraries aren't present t
 1. Draft applying the craft above.
 2. Test: run Tier 1 (if available) and always do Tier 2. Note every specific flag with its location.
 3. Revise *those specific spots* — don't rewrite wholesale, and don't just swap flagged words for synonyms. Fix the underlying habit the flag points to.
+
+   The trap here is the substitution that keeps the move. A "not X but Y" opener rewritten as "turns out it was Y" is the same rhetorical gesture in a new costume, and a reader clocks the gesture, not the wording. After each fix, ask what job the original sentence was doing. If the replacement still does that job, it has not been fixed. The way out is nearly always to state the plain fact and stop.
 4. Re-test. Repeat until it passes (no linter FAILs, score ≤ 20, self-read ≤ ~25) — or until two passes produce no real improvement, whichever comes first. Cap it at about 3–4 rounds; past that you're polishing plastic, and over-editing introduces its own engineered feel.
 5. When you hand the piece to the user, briefly say what you checked and where it landed (e.g. "ran it through the self-test — no tells flagged, reads clean"). Don't paste the full report unless they want it.
 

@@ -144,6 +144,38 @@ def analyze(text):
                    f"{cr} 'statement: elaboration' colons ({cr_dens:.1f}/100 words); repeated colon-reveals read as an engineered tic",
                    pts))
 
+    # 8b-ii. the reveal opener: a sentence whose job is to spring a mild
+    #        surprise before the fact arrives. "Turns out the hard part was
+    #        paying for it." / "What shaped it was the token bill." / "The
+    #        real problem was never the models."
+    #
+    #        These read as blog scaffolding because they withhold for a beat
+    #        and then pay off, which is a structure rather than a thought. The
+    #        cleft version ("What X was Y", "It was Y that X") is the same move
+    #        in different clothes, which is why both are matched here: fixing
+    #        one by rewriting into the other changes nothing a reader notices.
+    reveal_pats = [
+        r"\b(?:it )?turns out\b",
+        r"\bas it turn(?:s|ed) out\b",
+        r"^\s*(?:and )?(?:the )?(?:real|hard(?:est)?|interesting|surprising|tricky|actual|funny)\s+"
+        r"(?:part|thing|problem|question|answer|bit|issue)\s+(?:was|is|turned out)",
+        r"\bwhat (?:shaped|drove|made|killed|saved|changed|mattered)\b[^.?!]{0,40}\bwas\b",
+        r"\bthe (?:real|actual|whole) (?:problem|point|trick|answer|reason)\b[^.?!]{0,30}\b(?:was|is)\b",
+    ]
+    rev = 0
+    rev_hits = []
+    for pat in reveal_pats:
+        for m in re.finditer(pat, text, re.I | re.M):
+            rev += 1
+            rev_hits.append(" ".join(m.group(0).split())[:44])
+    sev = "FAIL" if rev >= 2 else ("WARN" if rev == 1 else "OK")
+    checks.append(("reveal-opener", sev, rev,
+                   (f"{rev} surprise-reveal construction(s): "
+                    f"{'; '.join(rev_hits[:3])}. State the fact instead; the "
+                    f"cleft rewrite is the same move in different clothes"
+                    if rev else "none"),
+                   (10 if sev == "FAIL" else (5 if sev == "WARN" else 0))))
+
     # 8c. over-explain / significance-clause: a trailing appositive that restates why
     #     the thing matters, tacked on after a comma, often parroting the source
     #     ("...compliance content for PCI, the rules that keep organisations in control").
