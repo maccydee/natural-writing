@@ -55,6 +55,7 @@ Abstraction is where voice goes to die, and it's what the machine defaults to. S
 - Real numbers over intensifiers: "cut load time from 4.2s to 900ms," not "significantly faster."
 - Named examples over gestures: "Postgres choked on the third join," not "the database had issues."
 - One lived, checkable detail the model couldn't have invented does more than a paragraph of adjectives.
+- **The portability test.** If a sentence could move unchanged to another person, company, product or country, it is filler. Either cut it or replace it with a fact, mechanism, consequence or judgement that only fits this subject. This is the fastest way to find the sentences that feel fine and say nothing.
 
 > **Before:** "Users often struggle with onboarding and abandon the process."
 > **After:** "Forty percent of new users quit on the same screen — the one asking for a card before showing a single feature."
@@ -85,6 +86,34 @@ Machine prose hedges everything and commits to nothing. A person has a position 
 - Cut recap conclusions. Trust the reader; end on the strongest concrete beat, not a summary.
 - Choose where the lede goes — front-load when the reader needs the answer fast (most practical writing), bury it when a short build earns a bigger payoff. The point is *choosing*, not defaulting.
 - Keep paragraph lengths uneven. A one-liner next to a long one. Uniform blocks are a signature.
+
+## When the words are someone else's
+
+Everything above describes how to write. Applying it to a draft someone else wrote is a different job, and the failure mode is specific: you strip the tells, apply the craft, and hand back prose that is cleaner, more varied, more concrete — and no longer sounds like them. That isn't a de-slop, it's a transplant, and the writer will feel it even if they can't name it.
+
+So before changing a line, read the whole thing and note three to five things that are **theirs**: a vocabulary quirk, a blunt register, a running joke, an admission, a digression they clearly enjoyed, an unevenness in polish. Keep that note to yourself. Then protect those things through every pass.
+
+> **Their line:** "Anyway the migration took three weekends and I still don't fully trust it."
+> **Over-edited:** "The migration required three weekends of work and continues to warrant monitoring."
+> Every tell is gone. So is the person. The admission was the most human thing on the page, and tidying it cost more than the roughness did.
+
+- **Make the minimum effective edit.** Fix the tells, the errors, the genuinely tangled sentences. Leave strong human lines alone even when you can see a tidier version. A rough draft with a real voice should still read as the same person afterwards, just clearer.
+- **Edge is not slop.** Strong opinions, profanity, self-interruption, an abrupt ending, a paragraph that runs long because they were annoyed — these are voice. Don't sand them into something more professional.
+- **Their structure is a choice until proven otherwise.** Keep the progression and the detours. If you do reorganise, say why.
+- **Don't add.** No invented examples, numbers, sources or opinions. Where something is unclear, ask rather than filling the gap with something plausible.
+- **Cut in proportion to the actual slop.** A draft that is 90% theirs and 10% filler needs a 10% edit. Compressing it by half because the craft rules say "cut 10-30%" strips character along with the padding — that guidance is for your own drafts, not someone else's.
+
+Say what you changed, briefly, at the end. A short list of what moved and why beats a silent rewrite the writer has to diff in their head.
+
+## Detect without rewriting
+
+Sometimes the job is an audit, not an edit — "does this read as AI?", "scan this before I send it". Answer that as a report, and don't rewrite the draft.
+
+Name each pattern you find, quote the line it appears in, and give the fix in a few words. That is it. Three specific rules make the report worth more than a detector:
+
+- **Don't claim to know whether a machine wrote it.** You can't, and neither can any detector. Name the patterns present. A named pattern with a quoted line is evidence the writer can check and act on; a confidence percentage is a guess wearing a number.
+- **Don't hand back a score as the answer.** `detect.py` produces one and it is useful for tracking a draft across revisions, but a number tells the writer nothing about what to change. Lead with the patterns.
+- **Don't slip into editing.** Rewriting a line "to show what I mean" turns an audit into an edit the writer did not ask for. Offer to edit afterwards.
 
 ## Workflow
 
@@ -152,4 +181,8 @@ Run this over any finished draft:
 - [ ] A clear stance or opinion is present, not just balanced neutrality.
 - [ ] Contractions used; em-dashes not clustered; headings sentence-cased.
 - [ ] Every "studies show" has a name/number/date, or is cut.
+- [ ] Nothing announces its own significance — no "marks a pivotal moment", no trailing ", highlighting…", no "the key point is".
+- [ ] No faux-insight setup ("what most people get wrong", "here's what nobody tells you").
+- [ ] Every generic-sounding sentence survives the portability test, or it's been cut or made specific.
+- [ ] If editing someone else's draft: they'd still recognise it as theirs.
 - [ ] It survives the read-aloud test and it's been cut by ~10–30% from the draft.

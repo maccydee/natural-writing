@@ -238,6 +238,62 @@ def analyze(text):
                    + (" — say the plain thing instead" if cf else ""),
                    min(12, len(cf) * 4)))
 
+    # 8g. faux-insight setup: a line that casts the writer as the lone person who knows,
+    #      then delivers an ordinary claim ("what most people get wrong", "here's what nobody
+    #      tells you"). Also the rhetorical wind-up ("what if I told you", "plot twist:").
+    #      Both are throat-clearing that flatters. Cut the setup; let the claim stand alone.
+    faux_pats = [
+        r"\b(?:here'?s |and )?what (?:most people|everyone|nobody|no one) (?:gets? wrong|misses?|tells? you|talks? about)\b",
+        r"\bthe part (?:most people|everyone|nobody) (?:skips?|misses?|gets? wrong)\b",
+        r"\bwhat (?:most people|everyone|nobody|no one) (?:don'?t|doesn'?t|won'?t) (?:tell|say|realize|realise|know)\b",
+        r"\bwhat if i told you\b", r"\bplot twist\s*:", r"\bthink about it\s*:",
+        r"\bhere'?s the (?:thing|kicker|secret|catch)\b",
+        r"\blet that sink in\b", r"\bread that again\b",
+    ]
+    faux = find_all(faux_pats, text)
+    sev = "FAIL" if len(faux) >= 2 else ("WARN" if faux else "OK")
+    checks.append(("faux-insight", sev, len(faux),
+                   ((", ".join(sorted(set(f.lower().strip() for f in faux))[:4])
+                     + " — cut the setup, state the claim") if faux else "none"),
+                   min(15, len(faux) * 7)))
+
+    # 8h. puffery: telling the reader a thing is significant instead of showing it. Two shapes —
+    #      the importance formula ("stands as a testament", "marks a pivotal moment") and the
+    #      trailing -ing clause that pretends to analyse ("…, highlighting the team's commitment").
+    #      Distinct from over-explain, which catches the appositive form (", the X that keeps…").
+    puff_pats = [
+        r"\b(?:stands?|serves?) as a testament\b", r"\bmarks? a (?:pivotal|defining|watershed) moment\b",
+        r"\bplays? a (?:vital|crucial|key|pivotal) role\b", r"\bsolidif(?:ies|y|ying) its position\b",
+        r"\bunderscor\w* (?:its|the) (?:significance|importance)\b",
+        r"\bcements? (?:its|their) (?:position|status|place)\b",
+        r",\s+(?:highlighting|underscoring|reflecting|showcasing|demonstrating|signal(?:l)?ing|emphasizing|emphasising|illustrating)\b",
+    ]
+    puff = find_all(puff_pats, text)
+    sev = "FAIL" if len(puff) >= 3 else ("WARN" if puff else "OK")
+    checks.append(("puffery", sev, len(puff),
+                   ((", ".join(sorted(set(x.lower().strip(" ,") for x in puff))[:4])
+                     + " — state the fact, let the reader judge") if puff else "none"),
+                   min(15, len(puff) * 5)))
+
+    # 8i. interpretive metadiscourse: stepping outside the subject to tell the reader how much
+    #      weight to give what they just read. If the point is clear this is noise; if it isn't,
+    #      the fix is more support, not a label. Borrowed from petergyang/no-ai-slop (MIT), which
+    #      names this better than anything we had.
+    meta_pats = [
+        r"\bthat last (?:part|bit|point) matters\b", r"\bthis (?:distinction|difference|part) matters\b",
+        r"\bthe key (?:point|thing|insight) (?:here )?is\b", r"\bas you can see\b",
+        r"\bwhich is (?:the )?(?:important|crucial|key) (?:part|bit|point)\b",
+        r"\bit'?s worth (?:noting|repeating|remembering)\b",
+        r"\bmore than it (?:sounds|seems|appears)\b",
+        r"\bin other words\b",
+    ]
+    meta = find_all(meta_pats, text)
+    sev = "FAIL" if len(meta) >= 3 else ("WARN" if len(meta) >= 1 else "OK")
+    checks.append(("metadiscourse", sev, len(meta),
+                   ((", ".join(sorted(set(m.lower().strip() for m in meta))[:4])
+                     + " — delete it, or replace with the support it is standing in for") if meta else "none"),
+                   min(12, len(meta) * 4)))
+
     # 9. contractions present (their absence is a tell)
     contr = len(re.findall(r"\b\w+['’](t|s|re|ve|ll|d|m)\b", text, re.I))
     sev = "WARN" if contr == 0 and wc > 60 else "OK"

@@ -116,7 +116,23 @@ A quick test: if a sentence would work as a motivational poster, cut the poster 
 
 ---
 
-## 7. Why detectors "see" all of this (brief)
+## 7. Telling the reader what to think
+
+Four related habits, all the same underlying move: instead of showing something, the prose announces its significance. A human writer trusts the reader to draw the conclusion. Several of these are borrowed from [petergyang/no-ai-slop](https://github.com/petergyang/no-ai-slop) (MIT), which names them more precisely than this file used to.
+
+- **Faux-insight setups.** "What most people get wrong…", "Here's what nobody tells you…", "The part everyone misses…". The setup casts the writer as the only person who knows, then delivers an ordinary claim. It's throat-clearing that flatters. Cut it and let the claim stand: "The part everyone misses: distribution is the moat" becomes "Distribution is the moat." `detect.py` flags these as `faux-insight`, along with the wind-up variants ("What if I told you…", "Plot twist:", "Let that sink in").
+- **Importance puffery.** "Stands as a testament to", "marks a pivotal moment", "plays a vital role", "solidifies its position", "underscores its significance". State the fact and stop. "The launch marks a pivotal moment for the company" becomes "It's the company's first paid product." Flagged as `puffery`.
+- **Superficial analysis.** A trailing `-ing` clause that looks like interpretation and isn't: "…, highlighting the team's commitment to quality", "…, underscoring the shift", "…, reflecting a broader trend". Replace it with the actual consequence: "The launch adds file search, so you can find an old draft without leaving the editor." Also `puffery`. (Related to §4's over-explaining, which catches the appositive form ", the X that keeps…".)
+- **Interpretive metadiscourse.** Lines that step outside the subject to direct the reader: "That last part matters more than it sounds", "The key point is", "As you can see", "This distinction matters", and redundant "In other words". If the point is already clear, delete the line. If it isn't, the fix is more support, not a label. Flagged as `metadiscourse`.
+
+## 8. Small mechanical tells
+
+- **Fake-strong verbs.** Reaching for an impressive verb where "is" or "has" is clearer and more honest. "The app serves as a centralised hub for sponsor management" becomes "The app tracks sponsors, drafts and due dates in one place." Watch "serves as", "acts as", "functions as", "leverages", "enables".
+- **Synonym cycling.** Rotating terms for variety when the clear word was already right — "the agent… the assistant… the tool…" across three sentences about one thing. Schoolroom advice ("don't repeat yourself") that reads as evasion. Repeat the word.
+- **Negative listing.** "Not a framework. Not a library. A way of thinking." Cousin of the negation pivot in §3, and the fix is the same: say the last thing and delete the run-up.
+- **Weasel attribution.** "Experts agree", "studies show", "widely regarded as", "industry reports suggest". Name the source, or cut the claim. Never invent one to fill the hole — if the writer has no source, ask. (Also §6; `detect.py` flags it as `vague-attribution`.)
+
+## 9. Why detectors "see" all of this (brief)
 
 AI-text detectors measure two things above all: **predictability** (how closely each word matches what a language model would expect — low = machine-like) and **uniformity** (how little the rhythm, sentence length, and vocabulary vary). Every pattern above is a symptom of one or both: inflated-but-safe diction is predictable; uniform paragraphs and relentless parallelism are uniform.
 
