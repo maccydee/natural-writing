@@ -27,6 +27,16 @@ If a user explicitly wants to game a named detector, tell them plainly: the dura
 Machine-sounding prose fails in two directions at once. Fix both.
 
 1. **It does things humans don't** — the tells: inflated diction, throat-clearing openers, rule-of-three everything, "it's not X, it's Y," uniform paragraphs, relentless positivity, hedging, vague "studies show." The full catalogue with fixes is in `references/ai-tells.md` — read it before a serious de-slop or humanize job.
+
+   One that hides from every rule about punctuation: **a denial in front of a
+   colon**, used to make the next clause land harder. "Not a trial: the team's
+   daily output ships to customers." "Not as a pilot: the same." It is an
+   em-dash aside wearing different punctuation, and a density check will never
+   see it, because one is already the tic. Write the two sentences instead, or
+   drop the denial and just say the thing. The linter now fails on it
+   (`negation-colon`), but it was caught by hand twice on a document the
+   linter had already passed at 3/100, which is the point: the score is a
+   backstop, not the test.
 2. **It fails to do things humans do** — the craft: varied rhythm, concrete specifics, a real stance, plain words, uneven structure. This is the harder half, and the more important one. You can strip every "delve" from a piece and it will still sound like a machine if it has no voice and no specifics.
 
 Avoiding the tells makes prose *inoffensive*. The craft below makes it *human*. Do both.
@@ -180,6 +190,9 @@ Run this over any finished draft:
 - [ ] At least one concrete, checkable specific — a number, a name, a real detail.
 - [ ] A clear stance or opinion is present, not just balanced neutrality.
 - [ ] Contractions used; em-dashes not clustered; headings sentence-cased.
+- [ ] No denial used as a drum-roll: "Not a trial: the output ships." Rewrite as
+      two sentences, or cut the denial. The colon is doing an em-dash's job and
+      it survives every rule written about em-dashes.
 - [ ] Every "studies show" has a name/number/date, or is cut.
 - [ ] Nothing announces its own significance — no "marks a pivotal moment", no trailing ", highlighting…", no "the key point is".
 - [ ] No faux-insight setup ("what most people get wrong", "here's what nobody tells you").

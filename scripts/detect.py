@@ -144,6 +144,34 @@ def analyze(text):
                    f"{cr} 'statement: elaboration' colons ({cr_dens:.1f}/100 words); repeated colon-reveals read as an engineered tic",
                    pts))
 
+    # 8b-ii. negation-colon: a denial used as a drum-roll.
+    #
+    # "Not a trial: the team's daily output ships to customers."
+    # "Not as a pilot: the team's daily output ships to customers."
+    # "No small thing: it took two years."
+    #
+    # The colon-reveal check above is density-aware, so one of these scores
+    # nothing and passes at 3/100. Density is the wrong test. One is already
+    # the tic, because the thing before the colon is not a clause doing work,
+    # it is a denial planted to make the clause after it land harder. It is
+    # the same move as an em-dash aside and it survives every rule written
+    # about em-dashes.
+    #
+    # Deliberately narrow. An earlier draft flagged any short verbless
+    # fragment and caught "Responsibilities:" (a heading) and "What changed:"
+    # (a clause whose verb was not in the list). Negation-led is the shape
+    # that actually reads as engineered, so that is what this asks about, and
+    # the content has to be on the same line, which a heading's is not.
+    neg_hits = [m.group(1).strip() for m in re.finditer(
+        r"(?:(?<=[.!?]\s)|(?<=\n)|^)((?:Not|No|Never|Nothing|Neither|Hardly)\b"
+        r"[^.!?:\n]{0,44}):[ \t]+\S", text)]
+    sev = "FAIL" if neg_hits else "OK"
+    checks.append(("negation-colon", sev, len(neg_hits),
+                   (f"{len(neg_hits)} denial-then-colon drum-roll(s): "
+                    + "; ".join(f'"{h}:"' for h in neg_hits[:3])
+                    if neg_hits else "none"),
+                   min(15, len(neg_hits) * 8)))
+
     # 8a-ii. corrective antithesis: defining a thing by what it is not, in the
     #        same breath. "The opt-out is one line, not six." / "It prunes its
     #        own boards but never gains new ones." / "A feature, not a bug."
