@@ -178,6 +178,37 @@ Higher perplexity and burstiness = more human. If the libraries aren't present t
 
 One caution worth repeating: passing every tier means *no detector-style tells were found*, not that any specific commercial detector will clear it. Detectors are unreliable and change often. The honest promise is writing that genuinely reads as human — which is what these tiers optimize for — not a guaranteed verdict from a tool you don't control. If a user needs a specific detector satisfied, tell them that plainly.
 
+## Rewriting loses facts, and the harder you rewrite the more it loses
+
+Measured, not asserted. A 2026 experiment on ten machine-written reports
+(krllagent/text-watermark-roundtrip, MIT) ran four transformations over the
+same texts and scored 100 pre-registered fact claims afterwards:
+
+| transformation | fact claims kept |
+|---|---|
+| full paraphrase by a competent model | 100 of 100 |
+| DIPPER-11B paraphraser | **77 of 100** |
+
+A dedicated paraphraser silently dropped or altered **roughly one claim in
+four** while producing text that still read fine. Nothing in the output
+announced it. That is the risk in every de-slop and humanize job: the prose
+improves and a number, a date or a scope quietly changes with it.
+
+So, on any rewrite of someone else's text or your own:
+
+- **Diff the claims, not the prose.** List every number, date, name, scope and
+  title in the source, then confirm each one survives unchanged. This is the
+  one check that cannot be done by reading the result, because a wrong number
+  reads exactly as well as a right one.
+- **Rewrite the sentence, not the paragraph**, when the paragraph carries
+  facts. Wholesale regeneration is where claims go missing.
+- **Prefer cutting to rephrasing.** A claim you remove is visibly gone. A
+  claim you rephrase can come back subtly wrong and nobody notices.
+
+The same study found round-trip translation through German or Chinese changed
+almost nothing about the text's machine origin (0 of 10) while still degrading
+it, so it is a cost with no return. Do not reach for it.
+
 ## Quick checklist
 
 Run this over any finished draft:
@@ -190,6 +221,11 @@ Run this over any finished draft:
 - [ ] At least one concrete, checkable specific — a number, a name, a real detail.
 - [ ] A clear stance or opinion is present, not just balanced neutrality.
 - [ ] Contractions used; em-dashes not clustered; headings sentence-cased.
+- [ ] No invisible characters: zero-width joiners, soft hyphens, bidi controls
+      and non-breaking spaces ride along on a paste, break applicant tracking
+      systems, and are visible to anyone who looks. The linter fails on them.
+- [ ] If this is a rewrite: every number, date, name and scope in the source is
+      still there and still says the same thing.
 - [ ] No denial used as a drum-roll: "Not a trial: the output ships." Rewrite as
       two sentences, or cut the denial. The colon is doing an em-dash's job and
       it survives every rule written about em-dashes.

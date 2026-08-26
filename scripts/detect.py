@@ -18,6 +18,7 @@ adds GPT-2 perplexity/burstiness (the signal classic detectors use). Skip it
 if the libraries aren't present — the core report stands on its own.
 """
 import sys, re, json, argparse, math
+from collections import Counter
 
 # ---- vocabulary (kept in sync with references/ai-tells.md) ----
 TELL_WORDS = [
@@ -143,6 +144,48 @@ def analyze(text):
     checks.append(("colon-reveal", sev, cr,
                    f"{cr} 'statement: elaboration' colons ({cr_dens:.1f}/100 words); repeated colon-reveals read as an engineered tic",
                    pts))
+
+    # 8c. characters you cannot see.
+    #
+    # Nothing to do with a statistical watermark, which lives in token choice
+    # and cannot be found by looking at bytes. This is the crude kind: zero
+    # width joiners, soft hyphens, bidi controls and non-breaking spaces that
+    # ride along when text is pasted out of a chat window or a PDF.
+    #
+    # Three separate reasons to care, and only one of them is provenance.
+    # They break an applicant tracking system's parsing, so a CV with a
+    # non-breaking space inside a date range can lose the date range. They
+    # survive copy and paste, so they travel into an email nobody inspected.
+    # And they are trivially visible to anyone who looks, which makes them
+    # worse than useless as a disguise and awkward to explain.
+    #
+    # Split by severity because a non-breaking space is often nobody's
+    # decision, while a zero width joiner in prose is never an accident of
+    # typing.
+    _INVISIBLE = {
+        "\u200b": "zero width space", "\u200c": "zero width non-joiner",
+        "\u200d": "zero width joiner", "\ufeff": "zero width no-break space",
+        "\u00ad": "soft hyphen", "\u2060": "word joiner",
+        "\u202a": "bidi override", "\u202b": "bidi override",
+        "\u202c": "bidi override", "\u202d": "bidi override",
+        "\u202e": "bidi override", "\u2066": "bidi isolate",
+        "\u2067": "bidi isolate", "\u2068": "bidi isolate",
+        "\u2069": "bidi isolate",
+    }
+    _ODD_SPACE = {"\u00a0": "non-breaking space", "\u2007": "figure space",
+                  "\u2009": "thin space", "\u202f": "narrow no-break space"}
+    inv = Counter(ch for ch in text if ch in _INVISIBLE)
+    odd = Counter(ch for ch in text if ch in _ODD_SPACE)
+    if inv:
+        detail = ", ".join(f"{_INVISIBLE[c]} x{n}" for c, n in inv.most_common(3))
+        sev, pts = "FAIL", min(15, sum(inv.values()) * 3)
+    elif odd:
+        detail = ", ".join(f"{_ODD_SPACE[c]} x{n}" for c, n in odd.most_common(3))
+        sev, pts = "WARN", 3
+    else:
+        detail, sev, pts = "none", "OK", 0
+    checks.append(("invisible-characters", sev, sum(inv.values()) + sum(odd.values()),
+                   detail, pts))
 
     # 8b-ii. negation-colon: a denial used as a drum-roll.
     #
