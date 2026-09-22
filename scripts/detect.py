@@ -338,6 +338,80 @@ def analyze(text):
                    + (" — say the plain thing instead" if cf else ""),
                    min(12, len(cf) * 4)))
 
+    # 8f-bis. the two-halves split: "getting it working is the easy half", "the
+    #      organisational half is the harder one", "that is half the job". A real
+    #      division into two parts is fine; the tell is calling one of them THE
+    #      half, which frames an ordinary observation as a neat dichotomy the
+    #      writer has just resolved. It arrives with "easy/hard", "other" and
+    #      "harder" attached, and it multiplies: four drafts of one cover letter
+    #      carried it in four different sentences before anyone noticed.
+    #      Same family as corrective-antithesis: shape doing the work of content.
+    HALVES = [
+        # any "the <adjective> half", not a fixed list: the construction is the
+        # tell, not the adjective. `(?!\s+of\s)` keeps "the first half of the
+        # year" and "the back half of Q3", which are ordinary time spans.
+        r"\bthe \w+ half\b(?!\s+of\s)",
+        r"\bhalf (?:the|of the) (?:job|work|battle|problem|story|point)\b",
+        r"\bis (?:the|only) half\b",
+        r"\bthe half that\b",
+        r"\b(?:both|two) halves\b",
+    ]
+    hv = find_all(HALVES, text)
+    sev = "FAIL" if len(hv) > 1 else ("WARN" if hv else "OK")
+    checks.append(("two-halves-split", sev, len(hv),
+                   (", ".join(sorted(set(h.lower() for h in hv))[:4]) if hv else "none")
+                   + (" — name the two things instead of ranking them as halves" if hv else ""),
+                   min(14, len(hv) * 7)))
+
+    # 8f-ii. yoked headline: a bullet's bold lead-in that pairs a plain action
+    #        with a rhetorical partner, usually joined by "and" and landing on a
+    #        flourish with no object of its own. Written on a CV in September
+    #        2026 and rejected on sight by the person whose CV it was:
+    #        "Shipped product features and argued the debt against them",
+    #        "Made the product's blind spots visible and owned",
+    #        "Fixed bad data at source instead of downstream". Each one is a
+    #        real fact wearing a second clause it does not need, and the second
+    #        clause is where the machine shows. The fix is to stop after the
+    #        fact: "Shipped new features into the product."
+    #
+    #        Scoped to bold lead-ins and to short standalone lines, because the
+    #        same shape mid-paragraph is ordinary English.
+    YOKED = [
+        # "... and <bare past participle>" with nothing after it
+        r"\*\*[^*\n]{8,90}\band\s+(?:owned|counted|understood|measured|"
+        r"defended|held|earned|proven|tracked|logged)\.?\*\*",
+        # "... and <verb> ... against/instead of/rather than <pronoun>"
+        r"\*\*[^*\n]{8,90}\band\s+[^*\n]{0,40}\b(?:against|instead of|"
+        r"rather than)\s+(?:them|it|those|that|downstream|upstream)\b[^*\n]{0,18}\*\*",
+        # "<action> at source instead of <abstraction>"
+        r"\*\*[^*\n]{0,60}\b(?:at source|from the start)\s+instead of\b[^*\n]{0,40}\*\*",
+    ]
+    yk = find_all(YOKED, text)
+    sev = "FAIL" if len(yk) > 1 else ("WARN" if yk else "OK")
+    checks.append(("yoked-headline", sev, len(yk),
+                   ("; ".join(" ".join(h.split())[:60] for h in yk[:3])
+                    + " — state the fact and stop" if yk else "none"),
+                   min(16, len(yk) * 8)))
+
+    # 8f-iii. insight frame: announcing which part of the work was the real one.
+    #        "The hard part was never the tooling", "the real work was", "the
+    #        model was the easy half". It reads as a lesson being handed down,
+    #        and it is the shape a model reaches for when it wants a sentence
+    #        to sound earned. Say what took the time.
+    INSIGHT = [
+        r"\bthe (?:hard|hardest|real|difficult|tricky) part (?:was|is|wasn'?t|isn'?t)\b",
+        r"\bthe real work (?:was|is|began|started)\b",
+        r"\bthe part that (?:mattered|matters|counted|counts) (?:was|is)\b",
+        r"\b(?:was|is|were|are) (?:the |only the )?easy (?:half|part|bit)\b",
+        r"\bthat last part is most of the job\b",
+    ]
+    ins = find_all(INSIGHT, text)
+    sev = "FAIL" if len(ins) >= 3 else ("WARN" if ins else "OK")
+    checks.append(("insight-frame", sev, len(ins),
+                   ("; ".join(" ".join(i.split())[:48] for i in ins[:3])
+                    + " — say what took the time, not which part was real" if ins else "none"),
+                   min(14, len(ins) * 6)))
+
     # 8g. faux-insight setup: a line that casts the writer as the lone person who knows,
     #      then delivers an ordinary claim ("what most people get wrong", "here's what nobody
     #      tells you"). Also the rhetorical wind-up ("what if I told you", "plot twist:").
