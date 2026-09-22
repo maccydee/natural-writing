@@ -393,6 +393,32 @@ def analyze(text):
                     + " — state the fact and stop" if yk else "none"),
                    min(16, len(yk) * 8)))
 
+    # 8f-iv. aphorism: a line about your own work that reaches for a general
+    #        law, or an epigram built on a semicolon. Written into a CV on
+    #        23 September 2026 and rejected within a minute of being read:
+    #        "because the constraint is usually somewhere nobody owns" and
+    #        "The work had moved; nobody had told the system." Both are true
+    #        observations wearing a proverb. The fix is to delete the clause:
+    #        the fact before it was already doing the work.
+    APHORISM = [
+        # "because X is usually/always/never Y" as a stated law
+        r"\bbecause\s+(?:the|that|it|this|they|people|nobody|everyone)?\s*\w*\s*"
+        r"(?:is|are|was|were)\s+(?:usually|always|often|never|rarely)\b",
+        # short epigram split by a semicolon, second half personifying or absolute
+        r"[^.!?\n]{10,70};\s+(?:nobody|no one|nothing|everyone|everything|none of)\b[^.!?\n]{3,60}[.!?]",
+        # "which is the X that Y" / "that is what Y" moral tacked on a fact
+        # ", which is the X that Y" / ", which is what Y": a noun-phrase moral
+        # tacked onto a fact. ", which is why <plain cause>" is left alone, it is
+        # an ordinary explanation and usually the most human line in a paragraph.
+        r",\s+which is (?:the|what) [^.;:!?\n]{4,50}(?=[.;!?\n]|$)",
+    ]
+    aph = find_all(APHORISM, text)
+    sev = "FAIL" if len(aph) >= 2 else ("WARN" if aph else "OK")
+    checks.append(("aphorism", sev, len(aph),
+                   ("; ".join(" ".join(a.split())[:52] for a in aph[:3])
+                    + " — delete the clause, the fact already did the work" if aph else "none"),
+                   min(14, len(aph) * 7)))
+
     # 8f-iii. insight frame: announcing which part of the work was the real one.
     #        "The hard part was never the tooling", "the real work was", "the
     #        model was the easy half". It reads as a lesson being handed down,
